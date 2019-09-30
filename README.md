@@ -1,2 +1,3 @@
 # tox-rpc
-Tox is a lightweight and high performance RPC framework.
+
+Tox 一个轻量、简洁的通讯层协议
