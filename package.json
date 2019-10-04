@@ -22,5 +22,8 @@
   "devDependencies": {
     "benchmark": "^2.1.4",
     "mocha": "^6.2.1"
+  },
+  "dependencies": {
+    "crc": "^3.8.0"
   }
 }

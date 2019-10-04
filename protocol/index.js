@@ -3,7 +3,7 @@
 class Protocol {
 
   constructor(version) {
-    this._version = version || 'v1.0.0';
+    this._version = version || 'v1';
   }
 
   encode() {
