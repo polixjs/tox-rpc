@@ -20,8 +20,14 @@ exports.encode = (serializer, opts) => {
   buf.put(PACKET_TYPE[opts.type].VALUE);
   buf.put(SERIALIZER_TYPE[opts.codec].VALUE);
   buf.put(VERSION[opts.version].VALUE);
-  buf.put(opts.isCrc === true && IS_CRC.N || IS_CRC.Y);
-  buf.put(opts.isCrc === true && IS_HPACK.N || IS_HPACK.Y);
+  buf.put(opts.isCrc && IS_CRC.N || IS_CRC.Y);
+  buf.put(opts.isCrc && IS_HPACK.N || IS_HPACK.Y);
+  // encode header
+  const headerBuf = serializer.encode(opts.headers);
+  buf.putShort(headerBuf);
+  const contentBuf = serializer.encode(opts.content);
+  buf.putInt(contentBuf);
+  return buf.array();
 };
 
 
