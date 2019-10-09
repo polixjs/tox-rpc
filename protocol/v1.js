@@ -22,14 +22,34 @@ exports.encode = (serializer, opts) => {
   buf.put(VERSION[opts.version].VALUE);
   buf.put(opts.isCrc && IS_CRC.N || IS_CRC.Y);
   buf.put(opts.isCrc && IS_HPACK.N || IS_HPACK.Y);
-  // encode header
   const headerBuf = serializer.encode(opts.headers);
-  buf.putShort(headerBuf);
+  buf.putShort(headerBuf.length);
+  if (opts.type === PACKET_TYPE.REQUEST.TEXT) {
+    buf.putInt(opts.timeout);
+  }
+  buf.putInt(opts.requestId);
   const contentBuf = serializer.encode(opts.content);
-  buf.putInt(contentBuf);
+  buf.putInt(contentBuf.length);
+  buf.put(headerBuf);
+  buf.put(contentBuf);
   return buf.array();
 };
 
 
-exports.decode = (serializer, opts) => {
+exports.decode = (serializer, opts, buf) => {
+  const proto = buf.get();
+  const packetType = buf.get();
+  const serializerType = buf.get();
+  const version = buf.get();
+  const isCrc = buf.get();
+  const isHpack = buf.get();
+  const headerLength = buf.getShort();
+  let timeout = null;
+  if (PACKET_TYPE.REQUEST.VALUE === packetType) {
+    timeout = buf.getInt();
+  }
+  const requestId = buf.getInt();
+  const contentLength = buf.getInt();
+  let headerBuf = buf.read(headerLength);
+  let content = buf.read(contentLength);
 };
