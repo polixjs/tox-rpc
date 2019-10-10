@@ -5,17 +5,12 @@ const Serializer = require('../serializer');
 class Transverter {
 
   constructor(opts) {
-    Object.defineProperties(this, {
-      _protocol: {
-        value: require(`./${opst.version}`),
-      },
-      _serializer: {
-        value: Serializer.build(opts.codecType),
-      },
-    });
+    this._protocol = require(`./${opts.version}`);
+    this._serializer = Serializer.build(opts.codecType);
   }
 
   encode(packet) {
+    const meta = packet.meta;
     const opts = {
       type: meta.packetType,
       codec: meta.codecType,

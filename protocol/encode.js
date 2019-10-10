@@ -8,7 +8,7 @@ const Transverter = require('./transverter');
 class Encoder extends Transform {
 
   constructor(opts) {
-    super(opts);
+    super();
     this._opts = opts;
     this._meta = {
       startTime: null,
@@ -30,12 +30,12 @@ class Encoder extends Transform {
     });
   }
 
-  reuqest(body, param, callback) {
+  reuqest(body, param = {}, callback) {
     this._push({
       headers: param.headers || {},
       content: body || {},
       meta: Object.assign(this._meta, {
-        timeout: param.timeout,
+        timeout: param.timeout || C.REQUEST_PARAM.TIMEOUT,
         packetType: C.PACKET_TYPE.REQUEST.TEXT,
         startTime: Date.now(),
       }),
@@ -75,9 +75,10 @@ class Encoder extends Transform {
     try {
       let fn = this._requestEncode;
       packet.packetType === C.PACKET_TYPE.RESPONSE.TEXT && (fn = this._responseEncode);
-      buf = fn(packet);
+      buf = fn.call(this, packet);
     } catch (err) {
       callback(err, packet);
+      throw new Error(err);
     }
     this.write(buf, err => {
       callback(err, packet);

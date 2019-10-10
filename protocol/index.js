@@ -14,7 +14,7 @@ const Decoder = require('./decode');
 
 class Protocol {
 
-  constructor(opts) {
+  constructor(opts = {}) {
     const version = opts.version;
     const codecType = opts.codecType;
     CHECK_VERSION(version);
