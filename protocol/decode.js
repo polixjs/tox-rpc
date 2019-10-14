@@ -1,6 +1,7 @@
 'use srict';
 
 const Writable = require('stream').Writable;
+const transverter = require('./transverter');
 
 class Decoder extends Writable {
 
@@ -25,6 +26,7 @@ class Decoder extends Writable {
   }
 
   _decode() {
+    transverter.decode(this._buf);
     return false;
   }
 

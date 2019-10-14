@@ -36,7 +36,7 @@ exports.encode = (serializer, opts) => {
 };
 
 
-exports.decode = (serializer, opts, buf) => {
+exports.decode = (serializer, buf) => {
   const proto = buf.get();
   const packetType = buf.get();
   const serializerType = buf.get();

@@ -2,28 +2,44 @@
 
 const Serializer = require('../serializer');
 
-class Transverter {
+const SerializerMap = {};
+const ProtocolMap = {};
 
-  constructor(opts) {
-    this._protocol = require(`./${opts.version}`);
-    this._serializer = Serializer.build(opts.codecType);
+exports.encode = (packet) => {
+  const meta = packet.meta;
+  if (!ProtocolMap[meta.version]) {
+    ProtocolMap[meta.version] = require(`./${meta.version}`);
   }
-
-  encode(packet) {
-    const meta = packet.meta;
-    const opts = {
-      type: meta.packetType,
-      codec: meta.codecType,
-      version: meta.version,
-      isCrc: meta.isCrc,
-      isHpack: meta.isHpack,
-      timeout: Number(meta.timeout),
-      requestId: meta.requestId,
-      headers: packet.headers,
-      content: packet.content,
-    };
-    return this._protocol.encode(this._serializer, opts);
+  const protocol = ProtocolMap[meta.version];
+  if (!SerializerMap[meta.codecType]) {
+    SerializerMap[meta.codecType] = Serializer.build(meta.codecType);
   }
-}
+  const serializer = SerializerMap[meta.codecType];
+  const opts = {
+    type: meta.packetType,
+    codec: meta.codecType,
+    version: meta.version,
+    isCrc: meta.isCrc,
+    isHpack: meta.isHpack,
+    timeout: Number(meta.timeout),
+    requestId: meta.requestId,
+    headers: packet.headers,
+    content: packet.content,
+  };
+  return protocol.encode(serializer, opts);
+};
 
-module.exports = Transverter;
+exports.decode = (buf) => {
+  const proto = buf[0];
+  const version = buf[1];
+  const codecType = buf[2];
+  if (!ProtocolMap[version]) {
+    ProtocolMap[version] = require(`./${version}`);
+  }
+  if (!SerializerMap[codecType]) {
+    SerializerMap[codecType] = Serializer.build(codecType);
+  }
+  const serializer = SerializerMap[codecType];
+  const protocol = ProtocolMap[version];
+  return protocol.decode(serializer, buf);
+};

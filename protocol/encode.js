@@ -3,7 +3,11 @@
 const Transform = require('stream').Transform;
 const util = require('../common/util');
 const C = require('../common/constant');
-const Transverter = require('./transverter');
+const transverter = require('./transverter');
+
+const H = {
+  'tox-rpc': 1
+};
 
 class Encoder extends Transform {
 
@@ -22,17 +26,13 @@ class Encoder extends Transform {
       headerLength: 0,
       bodyLength: 0,
     };
-    this._transverter = new Transverter({
-      version: this._meta.version,
-      codecType: this._meta.codecType,
-    });
     this.on('close', () => {
     });
   }
 
   reuqest(body, param = {}, callback) {
     this._push({
-      headers: param.headers || {},
+      headers: Object.assign(H, param.headers || {}),
       content: body || {},
       meta: Object.assign(this._meta, {
         timeout: param.timeout || C.REQUEST_PARAM.TIMEOUT,
@@ -55,7 +55,7 @@ class Encoder extends Transform {
 
   _requestEncode(packet) {
     packet.meta.requestId = util.uuid();
-    return this._transverter.encode(packet);
+    return transverter.encode(packet);
   }
 
   _responseEncode(packet) {
@@ -66,7 +66,7 @@ class Encoder extends Transform {
         throw new Error(`请求超时，响应超过 ${timeout} (ms)`);
       }
     }
-    return this._transverter.encode(packet);
+    return transverter.encode(packet);
   }
 
 
