@@ -26,7 +26,7 @@ exports.uuid = () => uuid().replace(/\-/g, '');
 */
 exports.execThrow = (fn, args, errMsg) => {
   try {
-    return fn(...args);
+    return fn.apply(this, args);
   } catch (err) {
     throw new Error(`${errMsg} ${err.message}`);
   };
@@ -37,7 +37,7 @@ exports.execThrow = (fn, args, errMsg) => {
  * 执行同步任务
  * @param {Function} fn 执行函数
  * @param {Array<any>} args 函数入参
- * @returns {Array<Object: error, any: data>} 返回值
+ * @returns {Array} 返回值
  */
 exports.execSyncBySuccess = (fn, args) => {
   try {
@@ -54,7 +54,7 @@ exports.execSyncBySuccess = (fn, args) => {
  * @param {String} v Tox 版本号
  */
 exports.CHECK_VERSION = v => {
-  if (v && VERSION[v] === null) {
+  if (v && VERSION[v] === undefined) {
     throw new Error(`Tox 协议没有此版本： ${v}`);
   }
 };
@@ -65,7 +65,7 @@ exports.CHECK_VERSION = v => {
  * @param {String} serializer 序列化协议名称
  */
 exports.CHECK_SERIALIZER = serializer => {
-  if (serializer && SERIALIZER_TYPE[serializer] === null) {
+  if (serializer && SERIALIZER_TYPE[serializer] === undefined) {
     throw new Error(`Tox 不支持此序列化协议： ${serializer}`);
   }
 };
@@ -105,3 +105,9 @@ exports.generatorId = (type = GENERATOR_ID_TYPE.SNOWFLAKE) => {
       return this.uuid();
   }
 };
+
+
+/**
+ * 空函数
+ */
+exports.noop = () => {};

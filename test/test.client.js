@@ -21,13 +21,10 @@ encoder.pipe(socket).pipe(decoder);
 
 // 监听 response / heartbeat_acl
 decoder.on('response', res => {
-  // console.log(res);
+  console.log('response', res);
 });
 
 // 发送 RPC 请求
 encoder.reuqest({
-  a: 1
-}, {
-}, (err, data) => {
-  console.log(err, data);
+  a: 'request'
 });

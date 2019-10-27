@@ -30,7 +30,7 @@ class Encoder extends Transform {
     });
   }
 
-  reuqest(body, param = {}, callback) {
+  reuqest(body, param = {}, callback = util.noop) {
     this._push({
       headers: Object.assign(H, param.headers || {}),
       content: body || {},
@@ -43,12 +43,16 @@ class Encoder extends Transform {
   }
 
 
-  response(packet, callback) {
+  response(req, packet, callback = util.noop) {
     this._push({
-      requestId: packet.requestId,
+      headers: Object.assign(H, packet.headers || {}),
       content: packet || {},
       meta: Object.assign(this._meta, {
         packetType: C.PACKET_TYPE.RESPONSE.TEXT,
+        timeout: req.timeout,
+        startTime: Date.now(),
+        codecType: req.codecType,
+        requestId: req.requestId,
       }),
     }, callback);
   }
@@ -74,7 +78,7 @@ class Encoder extends Transform {
     let buf;
     try {
       let fn = this._requestEncode;
-      packet.packetType === C.PACKET_TYPE.RESPONSE.TEXT && (fn = this._responseEncode);
+      packet.meta.packetType === C.PACKET_TYPE.RESPONSE.TEXT && (fn = this._responseEncode);
       buf = fn.call(this, packet);
     } catch (err) {
       callback(err, packet);

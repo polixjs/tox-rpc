@@ -37,8 +37,8 @@ exports.encode = (packet) => {
 exports.decode = (buf) => {
   const proto = buf[0];
   CHECK_PROTO(proto);
-  const version = buf[1];
   const codecType = buf[2];
+  const version = buf[3];
   const v = `V${version}`;
   CHECK_VERSION(v);
   if (!ProtocolMap[version]) {
@@ -46,9 +46,9 @@ exports.decode = (buf) => {
   }
   const serializerType = findSerializerType(codecType);
   if (!SerializerMap[serializerType]) {
-    SerializerMap[codecType] = Serializer.build(serializerType);
+    SerializerMap[serializerType] = Serializer.build(serializerType);
   }
-  const serializer = SerializerMap[codecType];
+  const serializer = SerializerMap[serializerType];
   const protocol = ProtocolMap[version];
   return protocol.decode(serializer, buf);
 };

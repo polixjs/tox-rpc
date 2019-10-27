@@ -39,15 +39,17 @@ exports.encode = (serializer, opts) => {
 exports.decode = (serializer, buf) => {
   const byteBuf = ByteBuffer.wrap(buf);
   byteBuf.get();
-  const packetType = byteBuf.get();
+  const packetTypeTag = byteBuf.get();
   byteBuf.get();
   byteBuf.get();
   const isCrc = byteBuf.get();
   const isHpack = byteBuf.get();
   const headerLength = byteBuf.getShort();
   let timeout = null;
-  if (PACKET_TYPE.REQUEST.VALUE === packetType) {
+  let packetType = PACKET_TYPE.RESPONSE.TEXT;
+  if (PACKET_TYPE.REQUEST.VALUE === packetTypeTag) {
     timeout = byteBuf.getInt();
+    packetType = PACKET_TYPE.REQUEST.TEXT;
   }
   const requestId = byteBuf.getLong().toString();
   const contentLength = byteBuf.getInt();
@@ -60,5 +62,7 @@ exports.decode = (serializer, buf) => {
     timeout,
     isCrc,
     isHpack,
+    packetType,
+    codecType: serializer.name,
   };
 };

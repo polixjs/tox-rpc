@@ -3,10 +3,12 @@
 const {
   execThrow,
 } = require('../common/util');
+const N = require('../common/constant').SERIALIZER_TYPE.JSON;
 
 class serializerBase {
 
-  constructor() {
+  constructor(name) {
+    this.name = name || N.TEXT;
   }
 
   decode(packet) {

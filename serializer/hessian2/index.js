@@ -1,6 +1,7 @@
 'use strict';
 
 const Hessian = require('hessian.js');
+const N = require('../../common/constant').SERIALIZER_TYPE.HESSIAN2;
 const {
   execThrow,
 } = require('../../common/util');
@@ -11,7 +12,7 @@ const V = '2.0';
 class Hessian2 extends serializerBase {
 
   constructor() {
-    super();
+    super(N.TEXT);
   }
 
   decode(packet) {

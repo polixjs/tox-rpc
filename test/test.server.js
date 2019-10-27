@@ -1,22 +1,21 @@
 'use strict';
 
 const net = require('net');
+const {} = require('../common/constant');
 const Tox = require('../protocol');
 const protocol = new Tox();
 
-const encoder = protocol.encode();
-const decoder = protocol.decode();
-
 const server = net.createServer(socket => {
+
+  const encoder = protocol.encode();
+  const decoder = protocol.decode();
 
   encoder.pipe(socket).pipe(decoder);
 
-  decoder.on('request', (buf) => {
-    console.log(buf);
-    encoder.reuqest({
-      a: '1',
-    }, null, (err, data) => {
-      console.log(err, data);
+  decoder.on('request', (data) => {
+    console.log('request', data);
+    encoder.response(data, {
+      a: 'response',
     });
   });
 
@@ -25,9 +24,11 @@ const server = net.createServer(socket => {
   });
   socket.once('close', () => {
     console.log('close');
+    socket.destroy();
   });
   socket.once('error', err => {
     console.log(err);
+    socket.destroy();
   });
 });
 

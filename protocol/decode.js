@@ -12,7 +12,7 @@ const getPacketLength = (buf) => {
   if (buf[1] === PACKET_TYPE.REQUEST.VALUE) {
     packetLen = 24 + buf.readInt16BE(6) + buf.readInt32BE(20);
   } else {
-    packetLen = 20 + buf.readInt16BE(6) + buf.readInt32BE(8);
+    packetLen = 20 + buf.readInt16BE(6) + buf.readInt32BE(16);
   }
 
   if (buf[4] === PACKET_PARAM.IS_CRC.N) {
@@ -48,10 +48,11 @@ class Decoder extends Writable {
     const bufLen = this._buf.length;
     const packetLen = getPacketLength(this._buf);
     if (bufLen < packetLen) {
-      return false;
+      return true;
     }
-    transverter.decode(this._buf);
-    return true;
+    const data = transverter.decode(this._buf);
+    this.emit(data.packetType.toLowerCase(), data);
+    return false;
   }
 
 }
