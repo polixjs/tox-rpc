@@ -1,7 +1,26 @@
 'use srict';
 
 const Writable = require('stream').Writable;
+const {
+  PACKET_PARAM,
+  PACKET_TYPE,
+} = require('../common/constant');
 const transverter = require('./transverter');
+
+const getPacketLength = (buf) => {
+  let packetLen = 0;
+  if (buf[1] === PACKET_TYPE.REQUEST.VALUE) {
+    packetLen = 24 + buf.readInt16BE(6) + buf.readInt32BE(20);
+  } else {
+    packetLen = 20 + buf.readInt16BE(6) + buf.readInt32BE(8);
+  }
+
+  if (buf[4] === PACKET_PARAM.IS_CRC.N) {
+    packetLen += 4;
+  }
+
+  return packetLen;
+};
 
 class Decoder extends Writable {
 
@@ -26,8 +45,13 @@ class Decoder extends Writable {
   }
 
   _decode() {
+    const bufLen = this._buf.length;
+    const packetLen = getPacketLength(this._buf);
+    if (bufLen < packetLen) {
+      return false;
+    }
     transverter.decode(this._buf);
-    return false;
+    return true;
   }
 
 }

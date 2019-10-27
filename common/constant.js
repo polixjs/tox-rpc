@@ -37,6 +37,10 @@ module.exports = {
       RESPONSE: 0x02,
     }),
   },
+  GENERATOR_ID_TYPE: {
+    SNOWFLAKE: 'snowflake',
+    UUID: 'uuid',
+  },
   REQUEST_PARAM: {
     TIMEOUT: 10 * 3600,
   },

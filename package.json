@@ -29,6 +29,7 @@
     "crc": "^3.8.0",
     "hessian.js": "^2.9.0",
     "hpack.js": "^2.1.6",
+    "simpleflakes": "^2.1.0",
     "uuid": "^3.3.3"
   }
 }

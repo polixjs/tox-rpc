@@ -27,7 +27,7 @@ exports.encode = (serializer, opts) => {
   if (opts.type === PACKET_TYPE.REQUEST.TEXT) {
     buf.putInt(opts.timeout);
   }
-  buf.putInt(opts.requestId);
+  buf.putLong(opts.requestId);
   const contentBuf = serializer.encode(opts.content);
   buf.putInt(contentBuf.length);
   buf.put(headerBuf);
@@ -37,19 +37,28 @@ exports.encode = (serializer, opts) => {
 
 
 exports.decode = (serializer, buf) => {
-  const proto = buf.get();
-  const packetType = buf.get();
-  const serializerType = buf.get();
-  const version = buf.get();
-  const isCrc = buf.get();
-  const isHpack = buf.get();
-  const headerLength = buf.getShort();
+  const byteBuf = ByteBuffer.wrap(buf);
+  byteBuf.get();
+  const packetType = byteBuf.get();
+  byteBuf.get();
+  byteBuf.get();
+  const isCrc = byteBuf.get();
+  const isHpack = byteBuf.get();
+  const headerLength = byteBuf.getShort();
   let timeout = null;
   if (PACKET_TYPE.REQUEST.VALUE === packetType) {
-    timeout = buf.getInt();
+    timeout = byteBuf.getInt();
   }
-  const requestId = buf.getInt();
-  const contentLength = buf.getInt();
-  let headerBuf = buf.read(headerLength);
-  let content = buf.read(contentLength);
+  const requestId = byteBuf.getLong().toString();
+  const contentLength = byteBuf.getInt();
+  const header = serializer.decode(byteBuf.read(headerLength));
+  const content = serializer.decode(byteBuf.read(contentLength));
+  return {
+    header,
+    content,
+    requestId,
+    timeout,
+    isCrc,
+    isHpack,
+  };
 };

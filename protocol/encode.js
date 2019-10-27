@@ -54,7 +54,7 @@ class Encoder extends Transform {
   }
 
   _requestEncode(packet) {
-    packet.meta.requestId = util.uuid();
+    packet.meta.requestId = util.generatorId();
     return transverter.encode(packet);
   }
 

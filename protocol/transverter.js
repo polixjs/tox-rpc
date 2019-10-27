@@ -1,6 +1,11 @@
 'use strict';
 
 const Serializer = require('../serializer');
+const {
+  CHECK_VERSION,
+  CHECK_PROTO,
+  findSerializerType,
+} = require('../common/util');
 
 const SerializerMap = {};
 const ProtocolMap = {};
@@ -31,13 +36,17 @@ exports.encode = (packet) => {
 
 exports.decode = (buf) => {
   const proto = buf[0];
+  CHECK_PROTO(proto);
   const version = buf[1];
   const codecType = buf[2];
+  const v = `V${version}`;
+  CHECK_VERSION(v);
   if (!ProtocolMap[version]) {
-    ProtocolMap[version] = require(`./${version}`);
+    ProtocolMap[version] = require(`./${v}`);
   }
-  if (!SerializerMap[codecType]) {
-    SerializerMap[codecType] = Serializer.build(codecType);
+  const serializerType = findSerializerType(codecType);
+  if (!SerializerMap[serializerType]) {
+    SerializerMap[codecType] = Serializer.build(serializerType);
   }
   const serializer = SerializerMap[codecType];
   const protocol = ProtocolMap[version];
