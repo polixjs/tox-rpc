@@ -44,7 +44,7 @@ Response
 - timeout 请求超时时间
 - requestId 请求数据包ID
 - bodyLength 数据包 body 长度
-- crc32 当 isCrc 为 1 时有该值，为消息体的 crc32 值
+- crc32 当 isCrc 为 0x01 时有该值，为消息体的 crc32 值
 
 ## Author
 tox.jx © [Ricky 泽阳](https://github.com/rickyes), Released under the MIT License. 

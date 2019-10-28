@@ -1,7 +1,6 @@
 'use strict';
 
 const net = require('net');
-const {} = require('../common/constant');
 const Tox = require('../protocol');
 const protocol = new Tox();
 

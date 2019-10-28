@@ -1,6 +1,7 @@
 'use strict';
 
 const uuid = require('uuid/v4');
+const hpack = require('hpack.js');
 const {
   simpleflake,
 } = require('simpleflakes');
@@ -11,9 +12,12 @@ const {
   PROTO,
   GENERATOR_ID_TYPE,
 } = require('../common/constant');
-const flakeBigInt = simpleflake();
 
 const LEN_INT_32 = 2 ** 16;
+const LEN_INT_16 = 2 ** 8;
+
+const flakeBigInt = simpleflake();
+
 
 /**
  * 生成不带`-`的 UUID
@@ -120,3 +124,38 @@ exports.noop = () => {};
  * 计算 crc 32 值
  */
 exports.crc32 = buf => (crc.crc32(buf) % LEN_INT_32) | 0;
+
+
+exports.HPACK_TYPE = {
+  COMPRESS: 'compress',
+  DECOMPRESS: 'decompress',
+};
+
+
+/**
+ * 构造hpack压缩和解压缩器
+ * @param {Number} size 动态表大小
+ */
+exports.getHpacker = (size = LEN_INT_16) => {
+  return {
+    compressor: hpack.compressor.create({table: {size}}),
+    decompressor: hpack.decompressor.create({table: {size}}),
+  };
+};
+
+
+/**
+ * hpack 压缩
+ * @param {Object|Buffer} data headers
+ * @param {String} type hpack 解压缩或压缩
+ */
+exports.hpack = (hpacker, data, type = exports.HPACK_TYPE.COMPRESS) => {
+  if (type === exports.HPACK_TYPE.COMPRESS) {
+    hpacker.write([data]);
+    return hpacker.read();
+  } else {
+    hpacker.write(data);
+    hpacker.execute();
+    return hpacker.read();
+  }
+};
