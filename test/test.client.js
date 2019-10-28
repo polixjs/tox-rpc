@@ -2,7 +2,9 @@
 
 const net = require('net');
 const Tox = require('../protocol');
-const protocol = new Tox();
+const protocol = new Tox({
+  isCrc: true,
+});
 const encoder = protocol.encode();
 const decoder = protocol.decode();
 const socket = net.connect(12200, '127.0.0.1');

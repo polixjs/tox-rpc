@@ -11,6 +11,7 @@ const {
     IS_HPACK,
   },
 } = require('../common/constant');
+const util = require('../common/util');
 
 const kMaxBuf = 8 * 1024 * 1024;
 
@@ -21,7 +22,7 @@ exports.encode = (serializer, opts) => {
   buf.put(SERIALIZER_TYPE[opts.codec].VALUE);
   buf.put(VERSION[opts.version].VALUE);
   buf.put(opts.isCrc && IS_CRC.N || IS_CRC.Y);
-  buf.put(opts.isCrc && IS_HPACK.N || IS_HPACK.Y);
+  buf.put(opts.isHpack && IS_HPACK.N || IS_HPACK.Y);
   const headerBuf = serializer.encode(opts.headers);
   buf.putShort(headerBuf.length);
   if (opts.type === PACKET_TYPE.REQUEST.TEXT) {
@@ -32,6 +33,10 @@ exports.encode = (serializer, opts) => {
   buf.putInt(contentBuf.length);
   buf.put(headerBuf);
   buf.put(contentBuf);
+  if (opts.isCrc) {
+    const packetFrame = buf._bytes.slice(0, buf.position());
+    buf.putInt(util.crc32(packetFrame));
+  }
   return buf.array();
 };
 
@@ -42,8 +47,16 @@ exports.decode = (serializer, buf) => {
   const packetTypeTag = byteBuf.get();
   byteBuf.get();
   byteBuf.get();
-  const isCrc = byteBuf.get();
-  const isHpack = byteBuf.get();
+  const isCrc = byteBuf.get() === IS_CRC.N && true || false;
+  const isHpack = byteBuf.get() === IS_HPACK && true || false;
+  if (isCrc) {
+    const packetLen = byteBuf.limit() - 4;
+    const packetFrame = byteBuf._bytes.slice(0, packetLen);
+    const crc32Value = byteBuf._bytes.readInt32BE(packetLen);
+    if (crc32Value !== util.crc32(packetFrame)) {
+      throw new Error('CRC 校验失败!');
+    }
+  }
   const headerLength = byteBuf.getShort();
   let timeout = null;
   let packetType = PACKET_TYPE.RESPONSE.TEXT;

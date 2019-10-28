@@ -53,6 +53,7 @@ class Encoder extends Transform {
         startTime: Date.now(),
         codecType: req.codecType,
         requestId: req.requestId,
+        isCrc: req.isCrc,
       }),
     }, callback);
   }

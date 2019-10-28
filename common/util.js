@@ -4,6 +4,7 @@ const uuid = require('uuid/v4');
 const {
   simpleflake,
 } = require('simpleflakes');
+const crc = require('crc');
 const {
   VERSION,
   SERIALIZER_TYPE,
@@ -11,6 +12,8 @@ const {
   GENERATOR_ID_TYPE,
 } = require('../common/constant');
 const flakeBigInt = simpleflake();
+
+const LEN_INT_32 = 2 ** 16;
 
 /**
  * 生成不带`-`的 UUID
@@ -111,3 +114,9 @@ exports.generatorId = (type = GENERATOR_ID_TYPE.SNOWFLAKE) => {
  * 空函数
  */
 exports.noop = () => {};
+
+
+/**
+ * 计算 crc 32 值
+ */
+exports.crc32 = buf => (crc.crc32(buf) % LEN_INT_32) | 0;
