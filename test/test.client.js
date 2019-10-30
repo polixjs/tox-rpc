@@ -4,6 +4,7 @@ const net = require('net');
 const Tox = require('../protocol');
 const protocol = new Tox({
   isCrc: true,
+  codecType: 'protobuf',
 });
 const encoder = protocol.encode();
 const decoder = protocol.decode();

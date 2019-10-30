@@ -8,6 +8,7 @@ const {
 const {
   SERIALIZER_TYPE,
   VERSION,
+  META_TYPE,
 } = require('../common/constant');
 const Encoder = require('./encode');
 const Decoder = require('./decode');
@@ -20,6 +21,7 @@ class Protocol {
     CHECK_VERSION(version);
     CHECK_SERIALIZER(codecType);
     this._opts = opts;
+    this._opts.codecMetaPaths = [];
     this._opts.version = version && version.toLocaleUpperCase() || VERSION.V1.TEXT;
     this._opts.codecType = codecType && codecType.toLocaleUpperCase() || SERIALIZER_TYPE.HESSIAN2.TEXT;
   }
@@ -32,6 +34,13 @@ class Protocol {
   decode() {
     this._decoder = new Decoder(this._opts);
     return this._decoder;
+  }
+
+  loadMeta(metaPath, type = META_TYPE.PROTOBUF) {
+    this._opts.codecMetaPaths.push({
+      type,
+      path: metaPath,
+    });
   }
 
 }

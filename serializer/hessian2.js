@@ -1,11 +1,11 @@
 'use strict';
 
 const Hessian = require('hessian.js');
-const N = require('../../common/constant').SERIALIZER_TYPE.HESSIAN2;
+const N = require('../common/constant').SERIALIZER_TYPE.HESSIAN2;
 const {
   execThrow,
-} = require('../../common/util');
-const serializerBase = require('../base');
+} = require('../common/util');
+const serializerBase = require('./base');
 
 const V = '2.0';
 

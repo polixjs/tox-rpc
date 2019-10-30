@@ -6,6 +6,7 @@ const {
   CHECK_PROTO,
   findSerializerType,
 } = require('../common/util');
+const {} = require('../common/constant');
 
 const SerializerMap = {};
 const ProtocolMap = {};
