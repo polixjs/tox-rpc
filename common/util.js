@@ -159,3 +159,14 @@ exports.hpack = (hpacker, data, type = exports.HPACK_TYPE.COMPRESS) => {
     return hpacker.read();
   }
 };
+
+
+/**
+ * 检查是否为空，null或者undefined
+ * @param {String} value 待检查值
+ */
+exports.CHECK_EMPTY = (value) => {
+  if (value === null || value === undefined) {
+    throw new Error(`${value} 值为空`);
+  }
+};

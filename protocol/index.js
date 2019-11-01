@@ -36,13 +36,6 @@ class Protocol {
     return this._decoder;
   }
 
-  loadMeta(metaPath, type = META_TYPE.PROTOBUF) {
-    this._opts.codecMetaPaths.push({
-      type,
-      path: metaPath,
-    });
-  }
-
 }
 
 

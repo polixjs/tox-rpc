@@ -2,7 +2,10 @@
 
 const net = require('net');
 const Tox = require('../protocol');
-const protocol = new Tox();
+const protocol = new Tox({
+  proto: [],
+  kirito: [],
+});
 
 const server = net.createServer(socket => {
 
