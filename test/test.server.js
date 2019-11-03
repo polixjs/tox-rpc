@@ -3,7 +3,7 @@
 const net = require('net');
 const Tox = require('../protocol');
 const protocol = new Tox({
-  proto: [],
+  proto: [__dirname + '/proto/test.proto'],
   kirito: [],
 });
 
@@ -17,7 +17,7 @@ const server = net.createServer(socket => {
   decoder.on('request', (data) => {
     console.log('request', data);
     encoder.response(data, {
-      a: 'response',
+      name: 'response',
     });
   });
 

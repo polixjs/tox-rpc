@@ -1,7 +1,6 @@
 'use strict';
 
 const protobuf = require('protobufjs');
-const protoLoad = require('util').promisify(protobuf.load);
 const N = require('../common/constant').SERIALIZER_TYPE.PROTOBUF;
 const {
   execThrow,
@@ -13,10 +12,26 @@ class Protobuf extends serializerBase {
 
   constructor() {
     super(N.TEXT);
+    this.classPkgMap = new Map();
   }
 
-  async loadClass(classPath) {
-    await protoLoad(classPath);
+  loadClass(classPath) {
+    const root = protobuf.loadSync(classPath);
+    const packages = root.nested;
+    for (const pkg in packages) {
+      if (packages.hasOwnProperty(pkg)) {
+        this.classPkgMap.set(pkg, root);
+      }
+    }
+  }
+
+  getClass(classPackage) {
+    const packageName = classPackage.split('.')[0];
+    const root = this.classPkgMap.get(packageName);
+    if (!root) {
+      throw new Error(`序列化描述文件不存在package: ${packageName}`);
+    }
+    return root.lookupType(classPackage);
   }
 
   encode(packet, className) {

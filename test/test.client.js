@@ -2,9 +2,13 @@
 
 const net = require('net');
 const Tox = require('../protocol');
+const {
+  HEADERS,
+} = require('../common/constant');
 const protocol = new Tox({
   isCrc: true,
   codecType: 'protobuf',
+  proto: [__dirname + '/proto/test.proto'],
 });
 const encoder = protocol.encode();
 const decoder = protocol.decode();
@@ -29,5 +33,9 @@ decoder.on('response', res => {
 
 // 发送 RPC 请求
 encoder.reuqest({
-  a: 'request'
+  name: 'request'
+}, {
+  headers: {
+    [HEADERS.TOX_CODEC_CLASS]: 'testPackage.TestMessage'
+  }
 });

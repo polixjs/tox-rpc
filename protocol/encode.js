@@ -25,6 +25,7 @@ class Encoder extends Transform {
       requestId: null,
       headerLength: 0,
       bodyLength: 0,
+      proto: opts.proto || [],
     };
     this.on('close', () => {
     });

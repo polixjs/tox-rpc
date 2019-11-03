@@ -6,10 +6,20 @@ const {
   CHECK_PROTO,
   findSerializerType,
 } = require('../common/util');
-const {} = require('../common/constant');
+const {
+  SERIALIZER_TYPE,
+} = require('../common/constant');
 
 const SerializerMap = {};
 const ProtocolMap = {};
+
+const loadCLass = (serializer, meta) => {
+  if (meta.codecType === SERIALIZER_TYPE.PROTOBUF.TEXT) {
+    meta.proto.forEach(proto => {
+      serializer.loadClass(proto);
+    });
+  }
+};
 
 exports.encode = (packet) => {
   const meta = packet.meta;
@@ -19,6 +29,7 @@ exports.encode = (packet) => {
   const protocol = ProtocolMap[meta.version];
   if (!SerializerMap[meta.codecType]) {
     SerializerMap[meta.codecType] = Serializer.build(meta.codecType);
+    loadCLass(SerializerMap[meta.codecType], meta);
   }
   const serializer = SerializerMap[meta.codecType];
   const opts = {
@@ -48,6 +59,7 @@ exports.decode = (buf) => {
   const serializerType = findSerializerType(codecType);
   if (!SerializerMap[serializerType]) {
     SerializerMap[serializerType] = Serializer.build(serializerType);
+    loadCLass(SerializerMap[meta.codecType], meta);
   }
   const serializer = SerializerMap[serializerType];
   const protocol = ProtocolMap[version];

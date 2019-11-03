@@ -23,7 +23,8 @@ exports.encode = (serializer, opts) => {
   buf.put(VERSION[opts.version].VALUE);
   buf.put(opts.isCrc && IS_CRC.N || IS_CRC.Y);
   buf.put(opts.isHpack && IS_HPACK.N || IS_HPACK.Y);
-  const headerBuf = serializer.encode(opts.headers);
+  // const headerBuf = serializer.encode(opts.headers);
+  const headerBuf = new Buffer(JSON.stringify(opts.headers));
   buf.putShort(headerBuf.length);
   if (opts.type === PACKET_TYPE.REQUEST.TEXT) {
     buf.putInt(opts.timeout);
