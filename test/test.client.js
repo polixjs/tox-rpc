@@ -8,7 +8,7 @@ const {
 const protocol = new Tox({
   isCrc: true,
   codecType: 'protobuf',
-  proto: [__dirname + '/proto/test.proto'],
+  proto: __dirname + '/proto',
 });
 const encoder = protocol.encode();
 const decoder = protocol.decode();
@@ -34,8 +34,6 @@ decoder.on('response', res => {
 // 发送 RPC 请求
 encoder.reuqest({
   name: 'request'
-}, {
-  headers: {
-    [HEADERS.TOX_CODEC_CLASS]: 'testPackage.TestMessage'
-  }
+}, (err) => {
+  console.log(err)
 });

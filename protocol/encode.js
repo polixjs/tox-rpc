@@ -16,24 +16,19 @@ class Encoder extends Transform {
     this._opts = opts;
     this._meta = {
       startTime: null,
-      codecType: opts.codecType,
       isCrc: opts.isCrc || false,
-      isHpack: opts.isHpack || true,
       version: opts.version,
       packetType: C.PACKET_TYPE.REQUEST.TEXT,
       timeout: opts.timeout || C.REQUEST_PARAM.TIMEOUT,
       requestId: null,
-      headerLength: 0,
-      bodyLength: 0,
-      proto: opts.proto || [],
+      contentLength: 0,
     };
     this.on('close', () => {
     });
   }
 
-  reuqest(body, param = {}, callback = util.noop) {
+  reuqest(body, callback = util.noop) {
     this._push({
-      headers: Object.assign(H, param.headers || {}),
       content: body || {},
       meta: Object.assign(this._meta, {
         timeout: param.timeout || C.REQUEST_PARAM.TIMEOUT,
@@ -52,7 +47,6 @@ class Encoder extends Transform {
         packetType: C.PACKET_TYPE.RESPONSE.TEXT,
         timeout: req.timeout,
         startTime: Date.now(),
-        codecType: req.codecType,
         requestId: req.requestId,
         isCrc: req.isCrc,
       }),
@@ -83,8 +77,7 @@ class Encoder extends Transform {
       packet.meta.packetType === C.PACKET_TYPE.RESPONSE.TEXT && (fn = this._responseEncode);
       buf = fn.call(this, packet);
     } catch (err) {
-      callback(err, packet);
-      throw new Error(err);
+      return callback(err, null);
     }
     this.write(buf, err => {
       callback(err, packet);

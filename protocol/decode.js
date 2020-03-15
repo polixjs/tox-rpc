@@ -24,8 +24,9 @@ const getPacketLength = (buf) => {
 
 class Decoder extends Writable {
 
-  constructor() {
+  constructor(opts) {
     super();
+    transverter.setSerializer(opts);
   }
 
   _write(chunk, encoding, callback) {
