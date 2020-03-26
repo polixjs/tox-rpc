@@ -26,7 +26,6 @@ class Decoder extends Writable {
 
   constructor(opts) {
     super();
-    transverter.setSerializer(opts);
   }
 
   _write(chunk, encoding, callback) {
